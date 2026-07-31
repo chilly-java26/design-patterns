@@ -6,12 +6,12 @@ package com.designpatterns.singleton;
  */
 public class Singleton {
     
-    // 饿汉模式：在类加载时就创建实例
+    // 在类加载时就创建实例
     private static final Singleton INSTANCE = new Singleton();
     
     // 私有构造函数，防止外部实例化
     private Singleton() {
-        System.out.println("Singleton 饿汉实例已创建");
+        System.out.println("Singleton 实例已创建");
     }
     
     // 提供全局访问点
@@ -21,6 +21,6 @@ public class Singleton {
     
     // 示例方法
     public void showMessage() {
-        System.out.println("这是饿汉单例模式的示例方法");
+        System.out.println("这是单例模式的示例方法");
     }
 }
