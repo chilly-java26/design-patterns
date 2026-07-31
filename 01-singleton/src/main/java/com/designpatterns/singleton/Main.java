@@ -1,5 +1,10 @@
 package com.designpatterns.singleton;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -59,6 +64,18 @@ public class Main {
         // 性能对比测试
         System.out.println("【6. 性能对比测试】");
         performanceComparison();
+        
+        System.out.println("\n----------------------------------------\n");
+        
+        // 测试反射攻击
+        System.out.println("【7. 反射攻击测试】");
+        testReflectionAttack();
+        
+        System.out.println("\n----------------------------------------\n");
+        
+        // 测试反序列化攻击
+        System.out.println("【8. 反序列化攻击测试】");
+        testSerializationAttack();
         
         System.out.println("\n✓ 测试完成！");
     }
@@ -168,5 +185,67 @@ public class Main {
         System.out.println(name + " 耗时: " + elapsed + " ms");
         
         return elapsed;
+    }
+    
+    /**
+     * 测试反射攻击
+     * 通过反射可以破坏单例模式
+     */
+    private static void testReflectionAttack() {
+        try {
+            // 正常获取实例
+            LazySingleton instance1 = LazySingleton.getInstance();
+            
+            // 通过反射创建实例
+            Constructor<LazySingleton> constructor = LazySingleton.class.getDeclaredConstructor();
+            constructor.setAccessible(true);  // 绕过私有构造函数
+            LazySingleton instance2 = constructor.newInstance();
+            
+            System.out.println("正常获取的实例: " + instance1);
+            System.out.println("反射创建的实例: " + instance2);
+            System.out.println("两个实例相同: " + (instance1 == instance2));
+            System.out.println("\n结论: ✗ 反射攻击成功！破坏了单例模式");
+            
+        } catch (Exception e) {
+            System.out.println("反射攻击被阻止！");
+            System.out.println("异常信息: " + e.getCause().getMessage());
+            System.out.println("\n结论: ✓ 成功防御反射攻击");
+        }
+    }
+    
+    /**
+     * 测试反序列化攻击
+     * 序列化和反序列化会创建新实例
+     */
+    private static void testSerializationAttack() {
+        try {
+            // 正常获取实例
+            LazySingleton instance1 = LazySingleton.getInstance();
+            
+            // 序列化
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(instance1);
+            oos.close();
+            
+            // 反序列化
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            LazySingleton instance2 = (LazySingleton) ois.readObject();
+            ois.close();
+            
+            System.out.println("原始实例: " + instance1);
+            System.out.println("反序列化实例: " + instance2);
+            System.out.println("两个实例相同: " + (instance1 == instance2));
+            
+            if (instance1 == instance2) {
+                System.out.println("\n结论: ✓ 成功防御反序列化攻击（readResolve 生效）");
+            } else {
+                System.out.println("\n结论: ✗ 反序列化攻击成功！破坏了单例模式");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("反序列化测试失败: " + e.getMessage());
+        }
     }
 }
