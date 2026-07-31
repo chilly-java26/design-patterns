@@ -77,6 +77,24 @@ public class Main {
         System.out.println("【8. 反序列化攻击测试】");
         testSerializationAttack();
         
+        System.out.println("\n----------------------------------------\n");
+        
+        // 测试枚举单例
+        System.out.println("【9. 枚举单例】");
+        testEnumSingleton();
+        
+        System.out.println("\n----------------------------------------\n");
+        
+        // 测试枚举单例的反射攻击
+        System.out.println("【10. 枚举单例 - 反射攻击测试】");
+        testEnumReflectionAttack();
+        
+        System.out.println("\n----------------------------------------\n");
+        
+        // 测试枚举单例的反序列化攻击
+        System.out.println("【11. 枚举单例 - 反序列化攻击测试】");
+        testEnumSerializationAttack();
+        
         System.out.println("\n✓ 测试完成！");
     }
     
@@ -246,6 +264,79 @@ public class Main {
             
         } catch (Exception e) {
             System.out.println("反序列化测试失败: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * 测试枚举单例
+     */
+    private static void testEnumSingleton() {
+        EnumSingleton instance1 = EnumSingleton.INSTANCE;
+        instance1.showMessage();
+        
+        EnumSingleton instance2 = EnumSingleton.INSTANCE;
+        instance2.showMessage();
+        
+        System.out.println("验证: " + (instance1 == instance2 ? "✓ 同一实例" : "✗ 不同实例"));
+    }
+    
+    /**
+     * 测试枚举单例的反射攻击
+     */
+    private static void testEnumReflectionAttack() {
+        try {
+            EnumSingleton instance1 = EnumSingleton.INSTANCE;
+            
+            // 尝试通过反射创建实例
+            Constructor<EnumSingleton> constructor = EnumSingleton.class.getDeclaredConstructor(String.class, int.class);
+            constructor.setAccessible(true);
+            EnumSingleton instance2 = constructor.newInstance("INSTANCE", 0);
+            
+            System.out.println("原始实例: " + instance1);
+            System.out.println("反射创建实例: " + instance2);
+            System.out.println("✗ 反射攻击成功");
+            
+        } catch (Exception e) {
+            System.out.println("反射攻击被阻止！");
+            System.out.println("异常类型: " + e.getClass().getSimpleName());
+            System.out.println("异常信息: " + e.getMessage());
+            System.out.println("\n结论: ✓ 枚举天然防御反射攻击（JVM 层面保护）");
+        }
+    }
+    
+    /**
+     * 测试枚举单例的反序列化攻击
+     */
+    private static void testEnumSerializationAttack() {
+        try {
+            EnumSingleton instance1 = EnumSingleton.INSTANCE;
+            instance1.setData("修改后的数据");
+            
+            // 序列化
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(instance1);
+            oos.close();
+            
+            // 反序列化
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            EnumSingleton instance2 = (EnumSingleton) ois.readObject();
+            ois.close();
+            
+            System.out.println("原始实例: " + instance1 + ", 数据: " + instance1.getData());
+            System.out.println("反序列化实例: " + instance2 + ", 数据: " + instance2.getData());
+            System.out.println("两个实例相同: " + (instance1 == instance2));
+            System.out.println("数据是否一致: " + instance1.getData().equals(instance2.getData()));
+            
+            if (instance1 == instance2) {
+                System.out.println("\n结论: ✓ 枚举天然防御反序列化攻击（JVM 层面保护）");
+            } else {
+                System.out.println("\n结论: ✗ 反序列化攻击成功");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("反序列化测试异常: " + e.getMessage());
         }
     }
 }
