@@ -1,0 +1,30 @@
+shape:
+  shapes:
+    # ★ 矩形：参数顺序任意
+    - clazz: com.example.shape.impl.Rectangle
+      params:
+        height: 10.0
+        width: 20.0
+    
+    # ★ 圆形：单参数
+    - clazz: com.example.shape.impl.Circle
+      params:
+        radius: 5.0
+    
+    # ★ 三角形：参数顺序任意
+    - clazz: com.example.shape.impl.Triangle
+      params:
+        height: 4.0
+        base: 6.0
+    
+    # ★ 文本框：多种类型（String, int, double）
+    - clazz: com.example.shape.impl.TextBox
+      params:
+        text: "Hello World"
+        fontSize: 24
+        opacity: 0.85
+
+    # ★ 五边形：单参数
+    - clazz: com.example.shape.impl.Pentagon
+      params:
+        side: 3.0
