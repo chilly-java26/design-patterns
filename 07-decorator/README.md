@@ -33,9 +33,47 @@
 - 装饰模式是继承的一个替代模式，可以动态扩展一个实现类的功能
 - 可以对一个对象进行多次装饰，通过使用不同的装饰类以及这些装饰类的排列组合，可以创造出很多不同行为的组合
 
+## 运行示例
+
+### 运行咖啡装饰示例
+```bash
+mvn compile
+mvn exec:java -Dexec.mainClass="com.designpatterns.decorator.DecoratorDemo"
+```
+
+### 运行Java IO装饰示例
+```bash
+mvn exec:java -Dexec.mainClass="com.designpatterns.decorator.javaio.JavaIODecoratorDemo"
+```
+
+### 运行MyBatis缓存装饰示例
+```bash
+mvn exec:java -Dexec.mainClass="com.designpatterns.decorator.mybatis.MyBatisCacheDemo"
+```
+
 ## 示例说明
-本例使用咖啡为例：
+
+### 1. 咖啡装饰示例 (decorator包)
+使用咖啡为例演示基础装饰器模式：
 - 基础咖啡 `SimpleCoffee`
 - 可以添加牛奶装饰 `MilkDecorator`
 - 可以添加糖装饰 `SugarDecorator`
 - 可以组合多个装饰器，如：加奶加糖的咖啡
+
+### 2. Java IO 装饰示例 (javaio包)
+展示Java IO中装饰器模式的实际应用：
+- `BufferedInputStream` - 添加缓冲功能
+- `DataInputStream` - 添加读取基本类型功能
+- `PrintStream` - 添加格式化输出功能
+- `UpperCaseInputStream` - 自定义装饰器示例
+
+Java IO是装饰器模式在JDK中的经典应用，通过组合不同的流装饰器可以灵活地添加各种功能。
+
+### 3. MyBatis 缓存装饰示例 (mybatis包)
+模拟MyBatis中缓存系统的装饰器实现：
+- `PerpetualCache` - 基础缓存（使用HashMap）
+- `LruCache` - LRU淘汰策略装饰器
+- `LoggingCache` - 日志统计装饰器
+- `SynchronizedCache` - 线程安全装饰器
+
+MyBatis通过装饰器模式实现了灵活的缓存增强系统，可以根据配置动态组合不同的缓存功能。
